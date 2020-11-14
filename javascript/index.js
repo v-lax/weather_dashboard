@@ -191,14 +191,14 @@ function displayWeatherOnClick(){
                  for(var i=3;i<fiveDayResponse.list.length;i+=8){
                      var date = fiveDayResponse.list[i].dt_txt.replace('12:00:00','')
                      $(`#date${i}`).text(date)
-                     $(`#img${i}`).attr('src',"http://openweathermap.org/img/wn/"+fiveDayResponse.list[i].weather[0].icon+"@2x.png")
+                     $(`#img${i}`).attr('src',"https://openweathermap.org/img/wn/"+fiveDayResponse.list[i].weather[0].icon+"@2x.png")
                      $(`#temp${i}`).text("Temprature: "+fiveDayResponse.list[i].main.temp +"°F")
                      $(`#hum${i}`).text("Humidity: "+fiveDayResponse.list[i].main.humidity+"%")
 
                  }
              })
 
-         var giphyUrl = "http://api.giphy.com/v1/gifs/search?q="+response.weather[0].description+"&api_key="+giphyApiKey+"&limit=10&rating=g"
+         var giphyUrl = "https://api.giphy.com/v1/gifs/search?q="+response.weather[0].description+"&api_key="+giphyApiKey+"&limit=10&rating=g"
 
          $.ajax({url:giphyUrl,method:'GET'})
          .then(function(giphyResponse){
