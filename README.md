@@ -24,9 +24,9 @@ You will also be able to see the five day forecast for the city that you typed i
 4. GIPHY API
 
 # Screenshot of Application
-![Screenshot of Weather Dashboard]()
+![Screenshot of Weather Dashboard](./assets/screenshot.png)
 
 # Link to deployed website. 
-* [Link to deployed site]()
+* [Link to deployed site](https://v-lax.github.io/weather_dashboard/html/)
 
 
