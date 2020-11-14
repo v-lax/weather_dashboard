@@ -28,7 +28,70 @@ function setupStorage(){
     localStorage.setItem("cities", JSON.stringify(city_array));
 }
 
+function init(){
+    var storedCities = JSON.parse(localStorage.getItem('cities'))
 
+    if(storedCities!==null){
+        city_array=storedCities
+    }
+    var city = city_array[city_array.length-1]
+    console.log(city_array)
+    console.log(city)
+     var url = "https://api.openweathermap.org/data/2.5/weather?q="+city+"&appid=" + APIKey + "&units=imperial";
+
+     $.ajax({url:url,method:'GET'})
+      .then(function(response){
+        console.log(response)
+        var milliseconds = response.dt * 1000
+        var dateObject = new Date(milliseconds)
+        var humanDateFormat = dateObject.toLocaleString()
+         $('#city-title').text(response.name)
+         $('#weather-icon').attr('src',"http://openweathermap.org/img/wn/"+response.weather[0].icon+"@2x.png")
+         $('#date').text(humanDateFormat)
+         $('#temprature').text("Temp: "+response.main.temp+"°F")
+         $('#humidity').text("Humidity: "+response.main.humidity+'%')
+         $('#wind-speed').text("Wind-Speed: "+response.wind.speed+'MPH')
+
+         var uvUrl = "http://api.openweathermap.org/data/2.5/uvi?lat="+response.coord.lat+"&lon="+response.coord.lon+"&appid="+APIKey
+
+         $.ajax({url:uvUrl,method:'GET'})
+          .then(function(uvResponse){
+            console.log(uvResponse)
+            var uvDiv=$('#uv-index')
+            uvDiv.text('UV Index: '+uvResponse.value)
+
+            if(uvResponse.value<=3){
+               uvDiv.attr('class','alert alert-dismissible alert-success')
+            }else if(uvResponse.value>=4 && uvResponse.value<7){
+               uvDiv.attr('class','alert alert-dismissible alert-primary')
+            }else if (uvResponse.value>=7){
+               uvDiv.attr('class','alert alert-dismissible alert-danger')
+            }
+
+          })
+
+          var fiveDayUrl = "http://api.openweathermap.org/data/2.5/forecast?q="+city+"&appid="+APIKey+ "&units=imperial"
+          $.ajax({url:fiveDayUrl,method:'GET'})
+           .then(function(fiveDayResponse){
+               console.log(fiveDayResponse)
+               for(var i=3;i<fiveDayResponse.list.length;i+=8){
+                   var date = fiveDayResponse.list[i].dt_txt.replace('12:00:00','')
+                   $(`#date${i}`).text(date)
+                   $(`#img${i}`).attr('src',"http://openweathermap.org/img/wn/"+fiveDayResponse.list[i].weather[0].icon+"@2x.png")
+                   $(`#temp${i}`).text("Temprature: "+fiveDayResponse.list[i].main.temp +"°F")
+                   $(`#hum${i}`).text("Humidity: "+fiveDayResponse.list[i].main.humidity+"%")
+
+               }
+           })
+
+         var giphyUrl = "http://api.giphy.com/v1/gifs/search?q="+response.weather[0].description+"&api_key="+giphyApiKey+"&limit=10&rating=g"
+
+         $.ajax({url:giphyUrl,method:'GET'})
+         .then(function(giphyResponse){
+            $('#weather-giphy').attr('src',giphyResponse.data[Math.floor(Math.random()*10)].embed_url)
+         })
+     })
+}
 
 function displayWeatherOnSubmit(){
     var city = $('#city-input').val()
@@ -151,16 +214,19 @@ $('#city-submit-button').on('click',function(event){
     event.preventDefault();
     
     var city_name=$('#city-input').val().trim();
-    city_array.push(city_name)
-    setupStorage();
-    displayWeatherOnSubmit();
-    renderCities();
-
-    $('#city-input').val('')
+    if(city_array.indexOf(city_name)===-1){
+        city_array.push(city_name)
+        setupStorage();
+        displayWeatherOnSubmit();
+        renderCities();
+    
+        $('#city-input').val('')
+    }
 })
 
 $(document).on("click",'.list-group-item', displayWeatherOnClick);
 
 renderCities();
+init();
 
 
